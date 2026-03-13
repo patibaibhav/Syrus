@@ -1,0 +1,201 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Syne:wght@500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg-primary: #0a0e1a;
+  --color-bg-secondary: #0d1321;
+  --color-bg-card: #131b2e;
+  --color-bg-elevated: #1a2540;
+  --color-border: #243152;
+  --color-cyan: #00D4FF;
+  --color-text: #e2e8f0;
+  --color-text-muted: #94a3b8;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* ── Scrollbar Styling ── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #344563;
+}
+
+/* ── Custom Component Styles ── */
+@layer components {
+  .card {
+    @apply bg-navy-800 border border-navy-600 rounded-lg;
+  }
+
+  .card-elevated {
+    @apply bg-navy-700 border border-navy-600 rounded-lg shadow-lg;
+  }
+
+  .btn-primary {
+    @apply px-4 py-2 bg-cyan-400 text-navy-950 font-semibold rounded
+           hover:bg-cyan-500 active:scale-[0.98] transition-all duration-150
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 border border-navy-600 text-slate-300 rounded
+           hover:bg-navy-700 hover:border-cyan-400/30 transition-all duration-150;
+  }
+
+  .btn-danger {
+    @apply px-4 py-2 bg-red-500/20 text-red-400 border border-red-500/30 rounded
+           hover:bg-red-500/30 transition-all duration-150;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-2.5 bg-navy-900 border border-navy-600 rounded
+           text-slate-200 placeholder-slate-500
+           focus:outline-none focus:border-cyan-400/50 focus:ring-1 focus:ring-cyan-400/20
+           transition-all duration-150;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium;
+  }
+
+  .badge-success {
+    @apply badge bg-green-500/20 text-green-400;
+  }
+
+  .badge-warning {
+    @apply badge bg-yellow-500/20 text-yellow-400;
+  }
+
+  .badge-danger {
+    @apply badge bg-red-500/20 text-red-400;
+  }
+
+  .badge-info {
+    @apply badge bg-cyan-400/20 text-cyan-400;
+  }
+
+  .badge-neutral {
+    @apply badge bg-slate-500/20 text-slate-400;
+  }
+}
+
+/* ── Typing Indicator ── */
+.typing-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--color-cyan);
+  animation: typing 1.2s infinite;
+}
+
+.typing-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* ── Progress Ring ── */
+.progress-ring-circle {
+  transition: stroke-dashoffset 0.8s ease-out;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+
+/* ── Risk Meter Glow ── */
+.risk-glow-high {
+  animation: riskPulse 2s ease-in-out infinite;
+}
+
+@keyframes riskPulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(239, 68, 68, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.6); }
+}
+
+/* ── Markdown Rendering ── */
+.prose-dark {
+  color: var(--color-text);
+}
+
+.prose-dark code {
+  background: var(--color-bg-elevated);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.875em;
+  color: var(--color-cyan);
+}
+
+.prose-dark pre {
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 16px;
+  overflow-x: auto;
+  margin: 12px 0;
+}
+
+.prose-dark pre code {
+  background: transparent;
+  padding: 0;
+  color: var(--color-text);
+}
+
+.prose-dark h1, .prose-dark h2, .prose-dark h3 {
+  font-family: 'Syne', sans-serif;
+  color: white;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.prose-dark ul, .prose-dark ol {
+  padding-left: 1.5em;
+  margin: 0.5em 0;
+}
+
+.prose-dark li {
+  margin: 0.25em 0;
+}
+
+.prose-dark a {
+  color: var(--color-cyan);
+  text-decoration: underline;
+}
+
+.prose-dark strong {
+  color: white;
+}
