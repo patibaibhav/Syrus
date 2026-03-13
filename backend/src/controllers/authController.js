@@ -105,13 +105,13 @@ async function register(req, res) {
     // Auto-match persona
     const userRole = role || 'developer';
     const userExpLevel = experienceLevel || 'junior';
-    const userTechStack = techStack || [];
+    const userTechStack = Array.isArray(techStack) ? techStack : [];
     const { persona, matchReason } = await autoMatchPersona(userRole, userExpLevel, userTechStack);
 
-    // Create user
+    // Create user — tech_stack is JSONB, so pass as a JSON-stringified value
     const userResult = await db.query(
       `INSERT INTO users (email, name, password_hash, role, experience_level, tech_stack, team, persona_id)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7, $8)
        RETURNING id, email, name, role, experience_level, tech_stack, team, persona_id, created_at`,
       [email, name, passwordHash, userRole, userExpLevel, JSON.stringify(userTechStack), team || null, persona ? persona.id : null]
     );
@@ -184,11 +184,13 @@ async function register(req, res) {
       error: null,
     });
   } catch (err) {
-    console.error('[AuthController] Registration error:', err.message);
+    console.error('[AuthController] Registration error:', err.message, err.stack);
     res.status(500).json({
       success: false,
       data: null,
-      error: 'Registration failed. Please try again.',
+      error: process.env.NODE_ENV === 'development'
+        ? `Registration failed: ${err.message}`
+        : 'Registration failed. Please try again.',
     });
   }
 }

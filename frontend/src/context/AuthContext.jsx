@@ -36,29 +36,39 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (email, password) => {
-    const res = await authAPI.login({ email, password });
-    if (res.data.success) {
-      const { token, user: userData, persona: personaData } = res.data.data;
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(userData));
-      setUser(userData);
-      setPersona(personaData);
-      return { success: true, user: userData };
+    try {
+      const res = await authAPI.login({ email, password });
+      if (res.data.success) {
+        const { token, user: userData, persona: personaData } = res.data.data;
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(userData));
+        setUser(userData);
+        setPersona(personaData);
+        return { success: true, user: userData };
+      }
+      return { success: false, error: res.data.error };
+    } catch (err) {
+      const message = err.response?.data?.error || err.message || 'Login failed';
+      return { success: false, error: message };
     }
-    return { success: false, error: res.data.error };
   };
 
   const register = async (formData) => {
-    const res = await authAPI.register(formData);
-    if (res.data.success) {
-      const { token, user: userData, persona: personaData } = res.data.data;
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(userData));
-      setUser(userData);
-      setPersona(personaData);
-      return { success: true, user: userData, persona: personaData };
+    try {
+      const res = await authAPI.register(formData);
+      if (res.data.success) {
+        const { token, user: userData, persona: personaData } = res.data.data;
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(userData));
+        setUser(userData);
+        setPersona(personaData);
+        return { success: true, user: userData, persona: personaData };
+      }
+      return { success: false, error: res.data.error };
+    } catch (err) {
+      const message = err.response?.data?.error || err.message || 'Registration failed';
+      return { success: false, error: message };
     }
-    return { success: false, error: res.data.error };
   };
 
   const logout = () => {
