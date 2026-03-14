@@ -5,8 +5,9 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js",
-    "db:init": "psql -f schema.sql && psql -f seed.sql"
+    "dev": "node server.js",
+    "db:init": "psql -f schema.sql && psql -f seed.sql",
+    "seed:generate": "node scripts/generatePs03Seed.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

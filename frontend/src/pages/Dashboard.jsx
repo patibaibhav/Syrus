@@ -19,23 +19,28 @@ export default function Dashboard() {
   const [productivity, setProductivity] = useState(null);
 
   useEffect(() => {
-    loadAnalytics();
-  }, [tasks]);
+    let cancelled = false;
 
-  const loadAnalytics = async () => {
-    try {
-      const [progressRes, riskRes, prodRes] = await Promise.all([
-        analyticsAPI.getProgress().catch(() => null),
-        analyticsAPI.getRisk().catch(() => null),
-        analyticsAPI.getProductivityEstimate().catch(() => null),
-      ]);
+    Promise.all([
+      analyticsAPI.getProgress().catch(() => null),
+      analyticsAPI.getRisk().catch(() => null),
+      analyticsAPI.getProductivityEstimate().catch(() => null),
+    ]).then(([progressRes, riskRes, prodRes]) => {
+      if (cancelled) {
+        return;
+      }
+
       if (progressRes?.data?.success) setProgress(progressRes.data.data);
       if (riskRes?.data?.success) setRisk(riskRes.data.data);
       if (prodRes?.data?.success) setProductivity(prodRes.data.data);
-    } catch (err) {
+    }).catch((err) => {
       console.error('Analytics load error:', err);
-    }
-  };
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [tasks]);
 
   return (
     <div className="h-screen flex flex-col bg-navy-950">
@@ -69,7 +74,7 @@ export default function Dashboard() {
       {/* Three-Panel Layout */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left Panel: Checklist */}
-        <div className="w-[320px] border-r border-navy-600 bg-navy-900/50 flex flex-col">
+        <div className="w-[320px] flex-shrink-0 border-r border-navy-600 bg-navy-900/50 flex flex-col">
           {tasksLoading ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-sm text-slate-500">Loading tasks...</div>
@@ -85,12 +90,12 @@ export default function Dashboard() {
         </div>
 
         {/* Center Panel: Chat */}
-        <div className="flex-1 flex flex-col bg-navy-950">
+        <div className="flex-1 min-w-0 flex flex-col bg-navy-950">
           <ChatWindow />
         </div>
 
         {/* Right Panel: Stats & Widgets */}
-        <div className="w-[280px] border-l border-navy-600 bg-navy-900/50 overflow-y-auto p-4 space-y-4">
+        <div className="w-[280px] flex-shrink-0 border-l border-navy-600 bg-navy-900/50 overflow-y-auto p-4 space-y-4">
           {/* Progress Ring */}
           <div className="card p-4 flex flex-col items-center">
             <ProgressRing percentage={progress?.percentComplete || 0} size={100} strokeWidth={6} />

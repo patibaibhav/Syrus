@@ -27,7 +27,7 @@ export default function ChatWindow() {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex min-w-0 flex-col h-full">
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3 border-b border-navy-600">
         <div className="w-8 h-8 rounded-full bg-cyan-400/20 flex items-center justify-center">
@@ -44,7 +44,7 @@ export default function ChatWindow() {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+      <div className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden px-4 py-4 space-y-4">
         {messages.length === 0 && !loading && (
           <div className="text-center py-12">
             <div className="w-14 h-14 rounded-full bg-cyan-400/10 flex items-center justify-center mx-auto mb-4">
@@ -52,7 +52,7 @@ export default function ChatWindow() {
             </div>
             <h3 className="text-sm font-semibold text-white mb-1">Hey there!</h3>
             <p className="text-xs text-slate-500 max-w-xs mx-auto">
-              I'm Axiom, your onboarding assistant. Ask me anything about setup, docs, or your tasks.
+              I'm Axiom, your NovaByte onboarding assistant. Ask me anything about setup, docs, or your tasks.
             </p>
             <div className="flex flex-wrap justify-center gap-2 mt-4">
               {['How do I set up my local env?', 'What are the coding standards?', 'Tell me about the architecture'].map((q) => (
@@ -84,7 +84,7 @@ export default function ChatWindow() {
           <input
             ref={inputRef}
             className="input-field flex-1 text-sm"
-            placeholder="Ask Axiom anything..."
+            placeholder="Ask Axiom about NovaByte setup, docs, or tasks..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
             disabled={loading}

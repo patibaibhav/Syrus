@@ -2,20 +2,25 @@ import { useState } from 'react';
 import TaskItem from './TaskItem';
 import TaskModal from './TaskModal';
 
-const CATEGORIES = ['Setup', 'Technical', 'Knowledge', 'Compliance'];
-
 export default function TaskList({ tasks, onStart, onVerify, onComplete }) {
   const [selectedTask, setSelectedTask] = useState(null);
   const [filter, setFilter] = useState('all');
 
-  const grouped = CATEGORIES.reduce((acc, cat) => {
+  const categories = [...new Set(
+    [...tasks]
+      .sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0))
+      .map((task) => task.category)
+      .filter(Boolean)
+  )];
+
+  const grouped = categories.reduce((acc, cat) => {
     acc[cat] = tasks.filter((t) => t.category === cat);
     return acc;
   }, {});
 
   const filteredCategories = filter === 'all'
-    ? CATEGORIES
-    : CATEGORIES.filter((cat) => {
+    ? categories
+    : categories.filter((cat) => {
         if (filter === 'pending') return grouped[cat]?.some((t) => t.status !== 'completed' && t.status !== 'verified');
         if (filter === 'completed') return grouped[cat]?.some((t) => t.status === 'completed' || t.status === 'verified');
         return true;

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 
-const TECH_OPTIONS = ['Node.js', 'Python', 'React', 'TypeScript', 'PostgreSQL', 'Docker', 'Redis', 'AWS', 'TailwindCSS', 'Express', 'FastAPI', 'Vite', 'Jest', 'Kubernetes', 'JavaScript'];
+const TECH_OPTIONS = ['Node.js', 'Python', 'React', 'TypeScript', 'PostgreSQL', 'Docker', 'Redis', 'AWS', 'TailwindCSS', 'Express', 'FastAPI', 'Vite', 'Jest', 'Kubernetes', 'JavaScript', 'Terraform', 'Helm', 'Kafka', 'GitHub Actions', 'Prometheus', 'Grafana', 'Poetry', 'React Query', 'Zustand', 'MongoDB', 'CSS'];
 
 export default function Register() {
   const { register } = useAuth();
@@ -58,7 +58,7 @@ export default function Register() {
             </div>
             <h1 className="text-2xl font-heading font-bold text-white">Axiom</h1>
           </div>
-          <p className="text-slate-400 text-sm">Begin your onboarding journey</p>
+          <p className="text-slate-400 text-sm">Begin your NovaByte onboarding journey</p>
         </div>
 
         {/* Progress Steps */}
@@ -91,7 +91,7 @@ export default function Register() {
               </div>
               <div>
                 <label className="block text-sm text-slate-400 mb-1.5">Email</label>
-                <input className="input-field" type="email" placeholder="alex@company.dev" value={form.email} onChange={(e) => updateField('email', e.target.value)} />
+                <input className="input-field" type="email" placeholder="alex@novabyte.dev" value={form.email} onChange={(e) => updateField('email', e.target.value)} />
               </div>
               <div>
                 <label className="block text-sm text-slate-400 mb-1.5">Password</label>

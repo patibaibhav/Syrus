@@ -40,7 +40,7 @@ export default function Login() {
             </div>
             <h1 className="text-2xl font-heading font-bold text-white">Axiom</h1>
           </div>
-          <p className="text-slate-400 text-sm">Developer Onboarding Intelligence</p>
+          <p className="text-slate-400 text-sm">NovaByte Developer Onboarding Intelligence</p>
         </div>
 
         {/* Login Card */}
@@ -59,7 +59,7 @@ export default function Login() {
               <input
                 type="email"
                 className="input-field"
-                placeholder="you@company.dev"
+                placeholder="you@novabyte.dev"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -108,8 +108,8 @@ export default function Login() {
           <div className="mt-6 pt-4 border-t border-navy-600">
             <p className="text-xs text-slate-500 mb-2">Demo credentials:</p>
             <div className="space-y-1 text-xs font-mono text-slate-400">
-              <p>Developer: dev@company.dev / password123</p>
-              <p>Manager: manager@company.dev / password123</p>
+              <p>Developer: riya.sharma@novabyte.dev / password123</p>
+              <p>Manager: manager@novabyte.dev / password123</p>
             </div>
           </div>
         </div>

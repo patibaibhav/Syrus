@@ -16,7 +16,7 @@ export default function TaskModal({ task, onClose, onVerify, onComplete }) {
       if (res.success) {
         setResult(res.data.verification);
       }
-    } catch (err) {
+    } catch {
       setResult({ passed: false, message: 'Verification request failed.' });
     } finally {
       setVerifying(false);

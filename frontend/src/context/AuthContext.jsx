@@ -1,38 +1,60 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect } from 'react';
 import { authAPI, userAPI } from '../services/api';
 
 const AuthContext = createContext(null);
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [persona, setPersona] = useState(null);
-  const [loading, setLoading] = useState(true);
+function getStoredUser() {
+  const token = localStorage.getItem('token');
+  const savedUser = localStorage.getItem('user');
 
-  // Load user from localStorage on mount
+  if (!token || !savedUser) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(savedUser);
+  } catch {
+    localStorage.removeItem('user');
+    return null;
+  }
+}
+
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(() => getStoredUser());
+  const [persona, setPersona] = useState(null);
+  const [loading, setLoading] = useState(() => Boolean(localStorage.getItem('token')));
+
   useEffect(() => {
     const token = localStorage.getItem('token');
-    const savedUser = localStorage.getItem('user');
-    if (token && savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-        // Fetch fresh profile
-        userAPI.getProfile().then((res) => {
-          if (res.data.success) {
-            setUser(res.data.data);
-            setPersona(res.data.data.persona);
-            localStorage.setItem('user', JSON.stringify(res.data.data));
-          }
-        }).catch(() => {
-          // Token expired, clear
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-          setUser(null);
-        });
-      } catch {
-        setUser(null);
-      }
+    if (!token) {
+      return;
     }
-    setLoading(false);
+
+    let cancelled = false;
+
+    userAPI.getProfile().then((res) => {
+      if (!cancelled && res.data.success) {
+        setUser(res.data.data);
+        setPersona(res.data.data.persona);
+        localStorage.setItem('user', JSON.stringify(res.data.data));
+      }
+    }).catch(() => {
+      if (!cancelled) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        setUser(null);
+        setPersona(null);
+      }
+    }).finally(() => {
+      if (!cancelled) {
+        setLoading(false);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const login = async (email, password) => {

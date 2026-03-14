@@ -37,7 +37,7 @@ export default function RiskMeter({ score = 0, factors = {} }) {
 
       {/* Factor indicators */}
       <div className="mt-3 space-y-1">
-        {Object.entries(factors).filter(([_, v]) => v?.signal_score > 0).map(([key, val]) => (
+        {Object.entries(factors).filter(([, value]) => value?.signal_score > 0).map(([key, val]) => (
           <div key={key} className="flex items-center justify-between text-[10px]">
             <span className="text-slate-500 capitalize">{key.replace(/_/g, ' ')}</span>
             <span className="text-slate-400 font-mono">{(val.signal_score * 100).toFixed(0)}%</span>
