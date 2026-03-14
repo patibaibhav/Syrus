@@ -1,6 +1,6 @@
 -- ============================================
 -- NovaByte PS03 Seed Data
--- Generated from external_resources/PS03
+-- Generated from backend\resources\PS03
 -- ============================================
 
 BEGIN;

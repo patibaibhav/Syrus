@@ -3,9 +3,13 @@ const path = require('path');
 const crypto = require('crypto');
 
 const ROOT_DIR = path.resolve(__dirname, '..', '..');
-const DATASET_DIR = path.join(ROOT_DIR, 'external_resources', 'PS03');
+const DATASET_CANDIDATE_DIRS = [
+  path.join(ROOT_DIR, 'backend', 'resources', 'PS03'),
+  path.join(ROOT_DIR, 'external_resources', 'PS03'),
+];
 const OUTPUT_FILE = path.join(ROOT_DIR, 'backend', 'seed.sql');
 const PASSWORD_HASH = '$2a$10$J8op36C7toLHjxha5qix6.sH.g9/c0Tvy8GxegLHaPrcZlHkwe5au';
+let resolvedDatasetDir = null;
 
 const DOCUMENT_SPECS = [
   {
@@ -72,16 +76,27 @@ const DEMO_PROGRESS = {
   'junior-fullstack-node-react': { completed: 5, active: 1 },
 };
 
-function ensureDatasetExists() {
-  if (!fs.existsSync(DATASET_DIR)) {
-    throw new Error(
-      `Dataset folder not found at ${DATASET_DIR}. Clone the PS03 resources repo into external_resources first.`
-    );
+function getDatasetDir() {
+  if (resolvedDatasetDir) {
+    return resolvedDatasetDir;
   }
+
+  resolvedDatasetDir = DATASET_CANDIDATE_DIRS.find((dir) => fs.existsSync(dir)) || null;
+  if (resolvedDatasetDir) {
+    return resolvedDatasetDir;
+  }
+
+  throw new Error(
+    `Dataset folder not found. Expected one of: ${DATASET_CANDIDATE_DIRS.map((dir) => path.relative(ROOT_DIR, dir)).join(', ')}.`
+  );
+}
+
+function ensureDatasetExists() {
+  getDatasetDir();
 }
 
 function readDatasetFile(filename) {
-  return fs.readFileSync(path.join(DATASET_DIR, filename), 'utf8').replace(/\r\n/g, '\n');
+  return fs.readFileSync(path.join(getDatasetDir(), filename), 'utf8').replace(/\r\n/g, '\n');
 }
 
 function stableUuid(key) {
@@ -657,7 +672,7 @@ function buildSeedSql({ personas, tasks, personaTasks, tickets, documents }) {
 
   lines.push('-- ============================================');
   lines.push('-- NovaByte PS03 Seed Data');
-  lines.push('-- Generated from external_resources/PS03');
+  lines.push(`-- Generated from ${path.relative(ROOT_DIR, getDatasetDir())}`);
   lines.push('-- ============================================');
   lines.push('');
   lines.push('BEGIN;');
@@ -904,7 +919,7 @@ function main() {
   const sql = buildSeedSql({ personas, tasks, personaTasks, tickets, documents });
 
   fs.writeFileSync(OUTPUT_FILE, sql, 'utf8');
-  console.log(`Generated ${path.relative(ROOT_DIR, OUTPUT_FILE)} from ${path.relative(ROOT_DIR, DATASET_DIR)}.`);
+  console.log(`Generated ${path.relative(ROOT_DIR, OUTPUT_FILE)} from ${path.relative(ROOT_DIR, getDatasetDir())}.`);
 }
 
 if (require.main === module) {
