@@ -1,4 +1,6 @@
-export default function RiskMeter({ score = 0, factors = {} }) {
+import { memo } from 'react';
+
+const RiskMeter = memo(function RiskMeter({ score = 0, factors = {} }) {
   const level = score > 0.7 ? 'high' : score > 0.4 ? 'medium' : 'low';
   const percentage = Math.round(score * 100);
 
@@ -46,4 +48,6 @@ export default function RiskMeter({ score = 0, factors = {} }) {
       </div>
     </div>
   );
-}
+});
+
+export default RiskMeter;

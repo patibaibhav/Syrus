@@ -1,4 +1,6 @@
-export default function ProgressRing({ percentage = 0, size = 120, strokeWidth = 8 }) {
+import { memo } from 'react';
+
+const ProgressRing = memo(function ProgressRing({ percentage = 0, size = 120, strokeWidth = 8 }) {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (percentage / 100) * circumference;
@@ -31,4 +33,6 @@ export default function ProgressRing({ percentage = 0, size = 120, strokeWidth =
       </div>
     </div>
   );
-}
+});
+
+export default ProgressRing;

@@ -610,31 +610,42 @@ async function buildGeminiReply(userId, message, userContext, retrievedDocs, nex
     return null;
   }
 
-  const response = await fetch(
-    `${GEMINI_API_URL}/${encodeURIComponent(process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL)}:generateContent`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-goog-api-key': process.env.GEMINI_API_KEY,
-      },
-      body: JSON.stringify({
-        system_instruction: {
-          parts: [
-            {
-              text: buildSystemPrompt(userContext, retrievedDocs, nextTask, message),
-            },
-          ],
+  const _geminiCtrl = new AbortController();
+  const _geminiTimer = setTimeout(() => _geminiCtrl.abort(), 15000);
+  let response;
+  try {
+    response = await fetch(
+      `${GEMINI_API_URL}/${encodeURIComponent(process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL)}:generateContent`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': process.env.GEMINI_API_KEY,
         },
-        contents: buildGeminiContents(await getChatHistory(userId, 6), message),
-        generationConfig: {
-          temperature: 0.5,
-          topP: 0.9,
-          maxOutputTokens: 700,
-        },
-      }),
-    }
-  );
+        body: JSON.stringify({
+          system_instruction: {
+            parts: [
+              {
+                text: buildSystemPrompt(userContext, retrievedDocs, nextTask, message),
+              },
+            ],
+          },
+          contents: buildGeminiContents(await getChatHistory(userId, 6), message),
+          generationConfig: {
+            temperature: 0.5,
+            topP: 0.9,
+            maxOutputTokens: 700,
+          },
+        }),
+        signal: _geminiCtrl.signal,
+      }
+    );
+  } catch (fetchErr) {
+    clearTimeout(_geminiTimer);
+    if (fetchErr.name === 'AbortError') throw new Error('Gemini request timed out after 15s.');
+    throw fetchErr;
+  }
+  clearTimeout(_geminiTimer);
 
   const responseBody = await response.json();
   if (!response.ok) {
@@ -664,26 +675,37 @@ async function buildOllamaReply(userId, message, userContext, retrievedDocs, nex
   }
 
   const baseUrl = String(process.env.OLLAMA_BASE_URL || DEFAULT_OLLAMA_BASE_URL).replace(/\/+$/, '');
-  const response = await fetch(`${baseUrl}/chat`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${process.env.OLLAMA_API_KEY}`,
-    },
-    body: JSON.stringify({
-      model: process.env.OLLAMA_MODEL || DEFAULT_OLLAMA_MODEL,
-      stream: false,
-      messages: buildOllamaMessages(
-        await getChatHistory(userId, 6),
-        message,
-        buildSystemPrompt(userContext, retrievedDocs, nextTask, message)
-      ),
-      options: {
-        temperature: 0.5,
-        top_p: 0.9,
+  const _ollamaCtrl = new AbortController();
+  const _ollamaTimer = setTimeout(() => _ollamaCtrl.abort(), 15000);
+  let response;
+  try {
+    response = await fetch(`${baseUrl}/chat`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${process.env.OLLAMA_API_KEY}`,
       },
-    }),
-  });
+      body: JSON.stringify({
+        model: process.env.OLLAMA_MODEL || DEFAULT_OLLAMA_MODEL,
+        stream: false,
+        messages: buildOllamaMessages(
+          await getChatHistory(userId, 6),
+          message,
+          buildSystemPrompt(userContext, retrievedDocs, nextTask, message)
+        ),
+        options: {
+          temperature: 0.5,
+          top_p: 0.9,
+        },
+      }),
+      signal: _ollamaCtrl.signal,
+    });
+  } catch (fetchErr) {
+    clearTimeout(_ollamaTimer);
+    if (fetchErr.name === 'AbortError') throw new Error('Ollama request timed out after 15s.');
+    throw fetchErr;
+  }
+  clearTimeout(_ollamaTimer);
 
   const responseBody = await response.json();
   if (!response.ok) {
@@ -700,7 +722,7 @@ async function buildAnthropicReply(message, userContext, retrievedDocs, nextTask
   }
 
   const response = await client.messages.create({
-    model: process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-20250514',
+    model: process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-6',
     max_tokens: 700,
     system: buildSystemPrompt(userContext, retrievedDocs, nextTask, message),
     messages: [

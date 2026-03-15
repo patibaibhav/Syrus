@@ -70,7 +70,7 @@ export default function TaskModal({ task, onClose, onVerify, onComplete }) {
             <label className="block text-sm text-slate-400 mb-2">Submit Evidence</label>
             <textarea
               className="input-field font-mono text-xs min-h-[100px] resize-y"
-              placeholder={`Paste the output of the verification command here...\n\nExample: ${task.verificationType === 'node_version' ? 'v18.19.0' : task.verificationType === 'text_confirmation' ? 'done' : 'Paste your terminal output'}`}
+              placeholder={`Paste the output of the verification command here...\n\nExample: ${task.verificationType === 'node_version' ? 'v18.19.0' : task.verificationType === 'text_confirmation' ? 'Done — I completed this step by...' : 'Paste your terminal output'}`}
               value={evidence}
               onChange={(e) => setEvidence(e.target.value)}
             />

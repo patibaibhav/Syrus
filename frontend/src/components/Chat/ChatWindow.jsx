@@ -1,10 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import { useChat } from '../../hooks/useChat';
 import MessageBubble from './MessageBubble';
 import TypingIndicator from './TypingIndicator';
 
-export default function ChatWindow() {
-  const { messages, loading, error, sendMessage, loadHistory } = useChat();
+export default function ChatWindow({ messages, loading, error, sendMessage, loadHistory }) {
   const [input, setInput] = useState('');
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);

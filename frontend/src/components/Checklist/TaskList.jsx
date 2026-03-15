@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import TaskItem from './TaskItem';
 import TaskModal from './TaskModal';
 
@@ -6,17 +6,25 @@ export default function TaskList({ tasks, onStart, onVerify, onComplete }) {
   const [selectedTask, setSelectedTask] = useState(null);
   const [filter, setFilter] = useState('all');
 
-  const categories = [...new Set(
+  // Keep selectedTask in sync with the live tasks array
+  useEffect(() => {
+    if (selectedTask) {
+      const updated = tasks.find((t) => t.id === selectedTask.id);
+      if (updated) setSelectedTask(updated);
+    }
+  }, [tasks]);
+
+  const categories = useMemo(() => [...new Set(
     [...tasks]
       .sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0))
       .map((task) => task.category)
       .filter(Boolean)
-  )];
+  )], [tasks]);
 
-  const grouped = categories.reduce((acc, cat) => {
+  const grouped = useMemo(() => categories.reduce((acc, cat) => {
     acc[cat] = tasks.filter((t) => t.category === cat);
     return acc;
-  }, {});
+  }, {}), [categories, tasks]);
 
   const filteredCategories = filter === 'all'
     ? categories

@@ -6,6 +6,7 @@
 
 const express = require('express');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 const apiRoutes = require('./routes/api');
 const errorHandler = require('./middleware/errorHandler');
 const localStore = require('./data/localStore');
@@ -41,8 +42,19 @@ app.use(
   })
 );
 
+// ── Auth Rate Limiting (20 attempts per 15 min) ──
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, data: null, error: 'Too many attempts. Try again in 15 minutes.' },
+  skip: (req) => process.env.NODE_ENV === 'test',
+});
+app.use('/api/auth', authLimiter);
+
 // ── Body Parsing ──
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 // ── Health Check ──

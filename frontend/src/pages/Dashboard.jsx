@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTasks } from '../hooks/useTasks';
+import { useChat } from '../hooks/useChat';
 import { analyticsAPI } from '../services/api';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import TaskList from '../components/Checklist/TaskList';
 import ChatWindow from '../components/Chat/ChatWindow';
 import ProgressRing from '../components/Dashboard/ProgressRing';
@@ -13,6 +14,7 @@ import StarterTicket from '../components/Dashboard/StarterTicket';
 export default function Dashboard() {
   const { user, persona, logout } = useAuth();
   const { tasks, loading: tasksLoading, startTask, verifyTask, completeTask } = useTasks();
+  const chat = useChat();
   const navigate = useNavigate();
   const [progress, setProgress] = useState(null);
   const [risk, setRisk] = useState(null);
@@ -20,25 +22,24 @@ export default function Dashboard() {
 
   useEffect(() => {
     let cancelled = false;
-
-    Promise.all([
-      analyticsAPI.getProgress().catch(() => null),
-      analyticsAPI.getRisk().catch(() => null),
-      analyticsAPI.getProductivityEstimate().catch(() => null),
-    ]).then(([progressRes, riskRes, prodRes]) => {
-      if (cancelled) {
-        return;
-      }
-
-      if (progressRes?.data?.success) setProgress(progressRes.data.data);
-      if (riskRes?.data?.success) setRisk(riskRes.data.data);
-      if (prodRes?.data?.success) setProductivity(prodRes.data.data);
-    }).catch((err) => {
-      console.error('Analytics load error:', err);
-    });
+    const timer = setTimeout(() => {
+      Promise.all([
+        analyticsAPI.getProgress().catch(() => null),
+        analyticsAPI.getRisk().catch(() => null),
+        analyticsAPI.getProductivityEstimate().catch(() => null),
+      ]).then(([progressRes, riskRes, prodRes]) => {
+        if (cancelled) return;
+        if (progressRes?.data?.success) setProgress(progressRes.data.data);
+        if (riskRes?.data?.success) setRisk(riskRes.data.data);
+        if (prodRes?.data?.success) setProductivity(prodRes.data.data);
+      }).catch((err) => {
+        console.error('Analytics load error:', err);
+      });
+    }, 1000);
 
     return () => {
       cancelled = true;
+      clearTimeout(timer);
     };
   }, [tasks]);
 
@@ -54,10 +55,10 @@ export default function Dashboard() {
           <span className="text-xs text-slate-500 font-mono ml-2">v1.0</span>
         </div>
         <div className="flex items-center gap-4">
-          <div className="text-right">
+          <Link to="/profile" className="text-right hover:opacity-80 transition-opacity">
             <p className="text-sm text-white font-medium">{user?.name}</p>
             <p className="text-[10px] text-slate-500">{persona?.name || user?.role}</p>
-          </div>
+          </Link>
           {user?.role === 'manager' && (
             <button onClick={() => navigate('/manager')}
               className="btn-secondary text-xs py-1.5 px-3">
@@ -91,7 +92,13 @@ export default function Dashboard() {
 
         {/* Center Panel: Chat */}
         <div className="flex-1 min-w-0 flex flex-col bg-navy-950">
-          <ChatWindow />
+          <ChatWindow
+            messages={chat.messages}
+            loading={chat.loading}
+            error={chat.error}
+            sendMessage={chat.sendMessage}
+            loadHistory={chat.loadHistory}
+          />
         </div>
 
         {/* Right Panel: Stats & Widgets */}

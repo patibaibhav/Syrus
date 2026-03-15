@@ -18,6 +18,14 @@ async function sendMessage(req, res) {
       });
     }
 
+    if (message.length > 2000) {
+      return res.status(400).json({
+        success: false,
+        data: null,
+        error: 'Message too long. Maximum 2000 characters.',
+      });
+    }
+
     const result = await ragService.chat(req.user.id, message.trim());
 
     res.json({

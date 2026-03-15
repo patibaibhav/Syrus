@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { ticketAPI } from '../../services/api';
 
-export default function StarterTicket() {
+const StarterTicket = memo(function StarterTicket() {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -67,4 +67,6 @@ export default function StarterTicket() {
       </div>
     </div>
   );
-}
+});
+
+export default StarterTicket;

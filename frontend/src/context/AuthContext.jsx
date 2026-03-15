@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect } from 'react';
 import { authAPI, userAPI } from '../services/api';
+import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext(null);
 
@@ -24,6 +25,7 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => getStoredUser());
   const [persona, setPersona] = useState(null);
   const [loading, setLoading] = useState(() => Boolean(localStorage.getItem('token')));
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -56,6 +58,17 @@ export function AuthProvider({ children }) {
       cancelled = true;
     };
   }, []);
+
+  // S5: respond to the auth:logout custom event fired by the axios interceptor
+  useEffect(() => {
+    const handler = () => {
+      setUser(null);
+      setPersona(null);
+      navigate('/login', { replace: true });
+    };
+    window.addEventListener('auth:logout', handler);
+    return () => window.removeEventListener('auth:logout', handler);
+  }, [navigate]);
 
   const login = async (email, password) => {
     try {
