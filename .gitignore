@@ -1,3 +1,4 @@
 external_resources/
 backend/.data/
+backend/.env
 frontend/.env
